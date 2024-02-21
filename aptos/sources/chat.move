@@ -9,7 +9,12 @@ module Chat {
     const MAX_TEXT_LENGTH: u64 = 512;
     const E_TEXT_OVERFLOW: u64 = 0;
 
-    struct Chat has key, store {
+    struct ChatRoom {
+        table: storage::HashMap<u64, Vector<Chat>>,
+        message_count: u64,
+    }
+
+    struct Chat has key, store, drop {
         id: GUID,
         // The ID of the chat app.
         app_id: address,

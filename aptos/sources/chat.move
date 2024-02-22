@@ -1,8 +1,9 @@
-module Chat {
+module chat_addr::Chat {
     use std::string::{String, utf8};
     use std::option::{Option, none, some};
-    use std::vector::Vector;
-    use aptos_std::table::{Self, Table};
+    use std::vector;
+    use std::signer;
+    use std::account;
     use aptos_framework::timestamp::Timestamp;
 
     const E_SENDER_MISMATCH: u64 = 2;
@@ -10,7 +11,7 @@ module Chat {
     const E_TEXT_OVERFLOW: u64 = 0;
 
     struct MessageRoom {
-        table: storage::Table<u64, Message>,
+        messages: vector<Message>,
         message_count: u64,
     }
 
@@ -29,7 +30,7 @@ module Chat {
 
     fun init_module(sender: &signer) {
         let room = MessageRoom {
-            table: table::new(),
+            messages: vector::empty(),
             message_count: 0,
         };
         move_to<MessageRoom>(sender, room);
@@ -37,62 +38,57 @@ module Chat {
 
     /// Simple Message object getter.
     #[view]
-    public fun get_messages() : Vec<Message> {
-        let room = borrow_global<MessageRoom>(&account::Self.address);
-        let messages = vector::empty<Message>();
-        for (i in 0..room.message_count) {
-            let message = table::get(&room.table, i);
-            vector::push_back<Message>(&mut messages, message);
-        }
-        messages
+    public fun get_messages() : vector<Message> {
+        let room = borrow_global<MessageRoom>(chat_addr);
+        room.messages
     }
 
     /// Post a Message object.
     fun post_internal(
+        signer: &signer,
         text: vector<u8>,
         ref_id: Option<address>,
         metadata: vector<u8>,
-        signer: &signer,
     ) {
         assert!(utf8::length(&text) <= MAX_TEXT_LENGTH, E_TEXT_OVERFLOW);
-
+        let addr = signer::address_of(signer);
         let message = Message {
-            sender: signer.address,
+            sender: addr,
             text: String::utf8(text),
             timestamp: Timestamp::now(),
             ref_id,
             metadata,
         };
 
-        let room = borrow_global_mut<MessageRoom>(&account::Self.address);
-        room.message_count += 1;
-        let message_count = room.message_count;
-        table::upsert(&mut room.table, message_count, message);
+        let room = borrow_global_mut<MessageRoom>(chat_addr);
+        room.message_count = room.message_count + 1;
+        vector::push_back(&mut room.messages, message);
     }
     
     /// Post a Message object without referencing another object.
     public entry fun post(
+        signer: &signer,
         text: vector<u8>,
         metadata: vector<u8>,
-        signer: &signer,
     ) {
-        post_internal(app_identifier, text, none(), metadata, signer);
+        post_internal(signer, text, none(), metadata);
     }
 
 
     public entry fun post_with_ref(
+        signer: &signer,
         app_identifier: address,
         text: vector<u8>,
         ref_identifier: address,
         metadata: vector<u8>,
-        signer: &signer,
     ) {
-        post_internal(app_identifier, text, some(ref_identifier), metadata, signer);
+        post_internal(signer, text, some(ref_identifier), metadata);
     }
 
     /// Burn a Message object.
-    public entry fun burn(message: Message, signer: &signer) {
-        assert!(message.sender == signer.address, E_SENDER_MISMATCH);
+    public entry fun burn(signer: &signer, message: Message) {
+        let addr = signer::address_of(signer);
+        assert!(message.sender == addr, E_SENDER_MISMATCH);
         let Message { sender: _, text: _, timestamp: _, ref_id: _, metadata: _ } = message;
     }
 }

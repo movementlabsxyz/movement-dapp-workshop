@@ -27,7 +27,7 @@ export default function Chat() {
     } = useSubmitTransaction();
 
     const getMessages = async () => {
-        const [messages] = await client.useABI(abi).view.getMessages({
+        const [messages] = await client.useABI(abi).view.get_messages({
             functionArguments: [],
             typeArguments: [],
         })

@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^1.7.0",
+    "@aptos-labs/wallet-adapter-ant-design": "^2.0.0",
     "@aptos-labs/wallet-adapter-react": "^2.1.8",
     "@thalalabs/surf": "^1.2.0",
     "next": "14.1.0",
+    "petra-plugin-wallet-adapter": "^0.4.4",
     "react": "^18",
     "react-dom": "^18"
   },

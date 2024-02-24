@@ -4,7 +4,8 @@ import { createSurfClient, createEntryPayload } from "@thalalabs/surf";
 import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
 import { useSubmitTransaction } from "@thalalabs/surf/hooks";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { networkInterfaces } from "os";
+import { NextResponse } from "next/server";
+import { hex2a, formatDate, formatAddress } from "@/util/functions";
 
 interface Message {
     sender: string;
@@ -46,17 +47,21 @@ export default function Chat() {
         data: submitResult,
     } = useSubmitTransaction();
 
-    const getMessages = async () => {
-        const [messages] = await client.useABI(abi).view.get_messages({
-            functionArguments: [chatAddress],
-            typeArguments: [],
-        })
-        setHistory(messages as Message[]);
-    }
+
 
     useEffect(() => {
+        const getMessages = async () => {
+            const [messages] = await client.useABI(abi).view.get_messages({
+                functionArguments: [chatAddress],
+                typeArguments: [],
+            })
+            await reset();
+            console.log(messages);
+            console.log(account?.address)
+            setHistory(messages as Message[]);
+        }
         getMessages()
-    }, [account?.address])
+    }, [account?.address, submitIsLoading])
 
 
     const postMessage = async () => {
@@ -67,7 +72,8 @@ export default function Chat() {
                 functionArguments: [message, [], chatAddress],
 
             });
-            await submitTransaction(payload);
+            const tx = await submitTransaction(payload);
+            return NextResponse.json({ tx });
         } catch (e) {
             console.error('error', e);
         }
@@ -81,14 +87,16 @@ export default function Chat() {
         <div className="grid grid-flow-col-1">
             <h1 className="text-lg">History</h1>
             {history.map((message, index) => (
-                <div className={message.sender == account?.address ? "hover:right-0" : ""} key={index}>
-                    <p>{message.text}</p>
-                    <p className="text-sm">{message.timestamp}</p>
+
+                <div key={index}>
+                    <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(account?.address as string) + ": "}{hex2a(message.text.slice(2))}</p>
+
+                    <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
                 </div>
             ))}
             <form onSubmit={(e) => { e.preventDefault(); postMessage(); }}>
                 <label className="p-2">Message
-                    <input type="text" className="z-2000 text-black p-2 m-2" defaultValue={"hello"} />
+                    <input type="text" className="z-2000 text-black p-2 m-2" defaultValue={"hello"} onChange={updateMessage} />
                 </label>
             </form>
             <button onClick={postMessage}>Send</button>

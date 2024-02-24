@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { createSurfClient, createEntryPayload } from "@thalalabs/surf";
-import { Aptos, AptosConfig } from '@aptos-labs/ts-sdk';
-import { useSubmitTransaction, useWalletClient } from "@thalalabs/surf/hooks";
+import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
+import { useSubmitTransaction } from "@thalalabs/surf/hooks";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { networkInterfaces } from "os";
 
 interface Message {
     sender: string;
@@ -14,12 +16,26 @@ interface Message {
 const chatAddress = "0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e";
 
 // instantiate the client
-const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://devnet.m1.movementlabs.xyz" })));
+// const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://aptos.devnet.m1.movementlabs.xyz" })));
+const client = createSurfClient(new Aptos(new AptosConfig({ network: Network.DEVNET })));
 const abi = { "address": "0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e", "name": "Chat", "friends": [], "exposed_functions": [{ "name": "create_chat_room", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer"], "return": [] }, { "name": "get_messages", "visibility": "public", "is_entry": false, "is_view": true, "generic_type_params": [], "params": ["address"], "return": ["vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>"] }, { "name": "post", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "vector<u8>", "address"], "return": [] }, { "name": "post_with_ref", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "address", "vector<u8>", "address"], "return": [] }], "structs": [{ "name": "ChatRoom", "is_native": false, "abilities": ["store", "key"], "generic_type_params": [], "fields": [{ "name": "messages", "type": "vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>" }, { "name": "message_count", "type": "u64" }] }, { "name": "Message", "is_native": false, "abilities": ["copy", "store", "key"], "generic_type_params": [], "fields": [{ "name": "sender", "type": "address" }, { "name": "text", "type": "vector<u8>" }, { "name": "timestamp", "type": "u64" }, { "name": "ref_id", "type": "0x1::option::Option<address>" }, { "name": "metadata", "type": "vector<u8>" }] }] } as const;
 export default function Chat() {
     const [history, setHistory] = useState([] as Message[]);
-    const [userAddress, setUserAddress] = useState("");
     const [message, setMessage] = useState("");
+
+    const {
+        connect,
+        account,
+        network,
+        connected,
+        disconnect,
+        wallet,
+        wallets,
+        signAndSubmitTransaction,
+        signTransaction,
+        signMessage,
+    } = useWallet();
+
 
     const {
         isIdle,
@@ -40,12 +56,8 @@ export default function Chat() {
 
     useEffect(() => {
         getMessages()
-    }, [userAddress])
+    }, [account?.address])
 
-
-    const updateMessage = (e: any) => {
-        setMessage(e.target.value);
-    };
 
     const postMessage = async () => {
         try {
@@ -61,19 +73,25 @@ export default function Chat() {
         }
     };
 
+    const updateMessage = (e: any) => {
+        setMessage(e.target.value);
+    };
+
     return (
         <div className="grid grid-flow-col-1">
             <h1 className="text-lg">History</h1>
             {history.map((message, index) => (
-                <div className={message.sender == userAddress ? "hover:right-0" : ""} key={index}>
+                <div className={message.sender == account?.address ? "hover:right-0" : ""} key={index}>
                     <p>{message.text}</p>
                     <p className="text-sm">{message.timestamp}</p>
                 </div>
             ))}
-            <textarea onChange={(e) => { updateMessage(e) }}></textarea>
-            <button className="b-10" onClick={() => {
-                postMessage()
-            }}>Post</button>
+            <form onSubmit={(e) => { e.preventDefault(); postMessage(); }}>
+                <label className="p-2">Message
+                    <input type="text" className="z-2000 text-black p-2 m-2" defaultValue={"hello"} />
+                </label>
+            </form>
+            <button onClick={postMessage}>Send</button>
         </div>
     )
 }

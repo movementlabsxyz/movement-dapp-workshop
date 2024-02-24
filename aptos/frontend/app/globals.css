@@ -32,3 +32,8 @@ body {
     text-wrap: balance;
   }
 }
+
+
+input {
+  z-index: 1;
+}

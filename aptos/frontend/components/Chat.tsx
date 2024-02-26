@@ -14,12 +14,12 @@ interface Message {
     ref_id: string;
     metadata: string;
 }
-const chatAddress = "0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e";
+const chatAddress = "0x9a193de087aa158925b341c204d71b897d121f183a9ceddae7a8c2bb1c052a46";
 
 // instantiate the client
-// const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://aptos.devnet.m1.movementlabs.xyz" })));
-const client = createSurfClient(new Aptos(new AptosConfig({ network: Network.DEVNET })));
-const abi = { "address": "0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e", "name": "Chat", "friends": [], "exposed_functions": [{ "name": "create_chat_room", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer"], "return": [] }, { "name": "get_messages", "visibility": "public", "is_entry": false, "is_view": true, "generic_type_params": [], "params": ["address"], "return": ["vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>"] }, { "name": "post", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "vector<u8>", "address"], "return": [] }, { "name": "post_with_ref", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "address", "vector<u8>", "address"], "return": [] }], "structs": [{ "name": "ChatRoom", "is_native": false, "abilities": ["store", "key"], "generic_type_params": [], "fields": [{ "name": "messages", "type": "vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>" }, { "name": "message_count", "type": "u64" }] }, { "name": "Message", "is_native": false, "abilities": ["copy", "store", "key"], "generic_type_params": [], "fields": [{ "name": "sender", "type": "address" }, { "name": "text", "type": "vector<u8>" }, { "name": "timestamp", "type": "u64" }, { "name": "ref_id", "type": "0x1::option::Option<address>" }, { "name": "metadata", "type": "vector<u8>" }] }] } as const;
+const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://aptos.devnet.m1.movementlabs.xyz" })));
+// const client = createSurfClient(new Aptos(new AptosConfig({ network: Network.DEVNET })));
+const abi = { "address": "0x9a193de087aa158925b341c204d71b897d121f183a9ceddae7a8c2bb1c052a46", "name": "Chat", "friends": [], "exposed_functions": [{ "name": "create_chat_room", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer"], "return": [] }, { "name": "get_messages", "visibility": "public", "is_entry": false, "is_view": true, "generic_type_params": [], "params": ["address"], "return": ["vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>"] }, { "name": "post", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "vector<u8>", "address"], "return": [] }, { "name": "post_with_ref", "visibility": "public", "is_entry": true, "is_view": false, "generic_type_params": [], "params": ["&signer", "vector<u8>", "address", "vector<u8>", "address"], "return": [] }], "structs": [{ "name": "ChatRoom", "is_native": false, "abilities": ["store", "key"], "generic_type_params": [], "fields": [{ "name": "messages", "type": "vector<0x5548665475c1807d19e3fc20bfb45cae242a14fce51ae1abb891ad06639c805e::Chat::Message>" }, { "name": "message_count", "type": "u64" }] }, { "name": "Message", "is_native": false, "abilities": ["copy", "store", "key"], "generic_type_params": [], "fields": [{ "name": "sender", "type": "address" }, { "name": "text", "type": "vector<u8>" }, { "name": "timestamp", "type": "u64" }, { "name": "ref_id", "type": "0x1::option::Option<address>" }, { "name": "metadata", "type": "vector<u8>" }] }] } as const;
 export default function Chat() {
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("");
@@ -47,21 +47,20 @@ export default function Chat() {
         data: submitResult,
     } = useSubmitTransaction();
 
-
+    const getMessages = async () => {
+        const [messages] = await client.useABI(abi).view.get_messages({
+            functionArguments: [chatAddress],
+            typeArguments: [],
+        })
+        console.log(messages);
+        console.log(account?.address)
+        await reset();
+        setHistory(messages as Message[]);
+    }
 
     useEffect(() => {
-        const getMessages = async () => {
-            const [messages] = await client.useABI(abi).view.get_messages({
-                functionArguments: [chatAddress],
-                typeArguments: [],
-            })
-            await reset();
-            console.log(messages);
-            console.log(account?.address)
-            setHistory(messages as Message[]);
-        }
-        getMessages()
-    }, [account?.address, submitIsLoading])
+        getMessages();
+    }, [account?.address, submitResult, submitError, submitIsLoading])
 
 
     const postMessage = async () => {
@@ -84,8 +83,9 @@ export default function Chat() {
     };
 
     return (
-        <div className="grid grid-flow-col-1">
+        <div className="grid grid-flow-col-1 group rounded-lg border border-transparent px-5 py-4 transition-colors border-gray-300 dark:border-neutral-700 dark:bg-neutral-800/30">
             <h1 className="text-lg">History</h1>
+            <div className="">
             {history.map((message, index) => (
 
                 <div key={index}>
@@ -94,12 +94,13 @@ export default function Chat() {
                     <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
                 </div>
             ))}
-            <form onSubmit={(e) => { e.preventDefault(); postMessage(); }}>
+            </div>
+            <form className="" onSubmit={(e) => { e.preventDefault(); postMessage(); }}>
                 <label className="p-2">Message
-                    <input type="text" className="z-2000 text-black p-2 m-2" defaultValue={"hello"} onChange={updateMessage} />
+                    <input type="text" className="z-2000 text-white bg-black p-2 m-2 border-[1px]" defaultValue={"hello"} onChange={updateMessage} />
                 </label>
             </form>
-            <button onClick={postMessage}>Send</button>
+            <button className="bg-black border-gray-300 rounded-lg border-[1px] text-white" onClick={postMessage}>Send</button>
         </div>
     )
 }

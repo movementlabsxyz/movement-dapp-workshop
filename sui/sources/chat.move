@@ -40,14 +40,14 @@ module nfts::chat {
     }
 
     /// Create a new chat room.
-    public entry fun create_chat_room(account: &signer) {
-        let addr = signer::address_of(account);
+    public entry fun create_chat_room(ctx: &mut TxContext) {
+        let addr = ctx.get_caller();
         assert!(!exists<ChatRoom>(addr), E_CHAT_ROOM_EXISTS);
         let room = ChatRoom {
             messages: vector::empty(),
             message_count: 0,
         };
-        move_to(account, room);
+        move_to(ctx, room);
     }
 
     /// Simple Message object getter.
@@ -60,31 +60,35 @@ module nfts::chat {
     #[allow(lint(self_transfer))]
     /// Mint (post) a Chat object.
     fun post_internal(
-        app_id: address,
         text: vector<u8>,
         ref_id: Option<address>,
         metadata: vector<u8>,
+        chat_room: address,
         ctx: &mut TxContext,
     ) {
         assert!(length(&text) <= MAX_TEXT_LENGTH, ETextOverflow);
         let chat = Chat {
-            id: object::new(ctx),
-            app_id,
-            text: ascii::string(text),
+            sender: ctx.get_caller(),
+            text: text,
+            timestamp: ctx.get_block_timestamp(),
             ref_id,
             metadata,
         };
+
+        let room = borrow_global_mut<ChatRoom>(chat_room);
+        room.message_count = room.message_count + 1;
+        room.messages.push(chat);
         transfer::public_transfer(chat, tx_context::sender(ctx));
     }
 
     /// Mint (post) a Chat object without referencing another object.
     public entry fun post(
-        app_identifier: address,
         text: vector<u8>,
         metadata: vector<u8>,
+        chat_room: address,
         ctx: &mut TxContext,
     ) {
-        post_internal(app_identifier, text, option::none(), metadata, ctx);
+        post_internal(text, option::none(), metadata, chat_room, ctx);
     }
 
     public entry fun post_with_ref(
@@ -94,6 +98,6 @@ module nfts::chat {
         metadata: vector<u8>,
         ctx: &mut TxContext,
     ) {
-        post_internal(app_identifier, text, some(ref_identifier), metadata, ctx);
+        post_internal(text, some(ref_identifier), metadata, chat_room, ctx);
     }
 }

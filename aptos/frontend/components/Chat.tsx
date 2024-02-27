@@ -14,7 +14,6 @@ interface Message {
     ref_id: string;
     metadata: string;
 }
-const chatAddress = "0x9a193de087aa158925b341c204d71b897d121f183a9ceddae7a8c2bb1c052a46";
 
 // instantiate the client
 const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://aptos.devnet.m1.movementlabs.xyz" })));
@@ -23,20 +22,7 @@ const abi = { "address": "0x9a193de087aa158925b341c204d71b897d121f183a9ceddae7a8
 export default function Chat() {
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("");
-
-    const {
-        connect,
-        account,
-        network,
-        connected,
-        disconnect,
-        wallet,
-        wallets,
-        signAndSubmitTransaction,
-        signTransaction,
-        signMessage,
-    } = useWallet();
-
+    const { account } = useWallet();
 
     const {
         isIdle,
@@ -49,7 +35,7 @@ export default function Chat() {
 
     const getMessages = async () => {
         const [messages] = await client.useABI(abi).view.get_messages({
-            functionArguments: [chatAddress],
+            functionArguments: [abi.address],
             typeArguments: [],
         })
         console.log(messages);
@@ -68,7 +54,7 @@ export default function Chat() {
             const payload = createEntryPayload(abi, {
                 function: 'post',
                 typeArguments: [],
-                functionArguments: [message, [], chatAddress],
+                functionArguments: [message, [], abi.address],
 
             });
             const tx = await submitTransaction(payload);
@@ -86,18 +72,18 @@ export default function Chat() {
         <div className="grid grid-flow-col-1 group rounded-lg border border-transparent px-5 py-4 transition-colors border-gray-300 dark:border-neutral-700 dark:bg-neutral-800/30">
             <h1 className="text-lg">History</h1>
             <div className="">
-            {history.map((message, index) => (
+                {history.map((message, index) => (
 
-                <div key={index}>
-                    <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(account?.address as string) + ": "}{hex2a(message.text.slice(2))}</p>
+                    <div key={index}>
+                        <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(account?.address as string) + ": "}{hex2a(message.text.slice(2))}</p>
 
-                    <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
-                </div>
-            ))}
+                        <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
+                    </div>
+                ))}
             </div>
             <form className="" onSubmit={(e) => { e.preventDefault(); postMessage(); }}>
                 <label className="p-2">Message
-                    <input type="text" className="z-2000 text-white bg-black p-2 m-2 border-[1px]" defaultValue={"hello"} onChange={updateMessage} />
+                    <input type="text" className="z-2000 text-white bg-black p-2 m-2 border-[1px]ot " defaultValue={"hello"} onChange={updateMessage} />
                 </label>
             </form>
             <button className="bg-black border-gray-300 rounded-lg border-[1px] text-white" onClick={postMessage}>Send</button>

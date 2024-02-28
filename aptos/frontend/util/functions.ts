@@ -28,5 +28,6 @@ export function formatDate(date: any) {
 }
 
 export function formatAddress(address: string) {
-    return address ? "" : address?.slice(2, 4) + '...' + address.slice(-2);
+    if (!address) return "";
+    return address?.slice(2, 4) + '...' + address?.slice(-2);
 }

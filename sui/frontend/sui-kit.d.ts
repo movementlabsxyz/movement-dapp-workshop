@@ -1,0 +1,1 @@
+declare module '@scallop-io/sui-kit';

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@scallop-io/sui-kit": "^0.44.2"
+  }
+}

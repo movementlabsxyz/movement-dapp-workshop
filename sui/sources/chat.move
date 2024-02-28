@@ -1,5 +1,4 @@
-module nfts::chat {
-    use std::ascii::{Self, String};
+module chat::chat {
     use std::option::{Self, Option, some};
     use sui::object::{Self, UID};
     use sui::transfer;
@@ -13,7 +12,7 @@ module nfts::chat {
     /// Text size overflow.
     const ETextOverflow: u64 = 0;
 
-    struct Message has key, store, copy {
+    struct Message has key, store {
         id: UID,
         sender: address,
         // Post's text.
@@ -81,9 +80,9 @@ module nfts::chat {
             ref_id,
             metadata,
         };
-        let messages = chat_room.messages;
+        let messages = &mut chat_room.messages;
         chat_room.message_count = chat_room.message_count + 1;
-        vector::push_back(&mut messages, message);
+        vector::push_back(messages, message);
     }
 
     /// Mint (post) a Chat object without referencing another object.

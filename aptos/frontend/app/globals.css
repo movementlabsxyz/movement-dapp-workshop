@@ -1,7 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@font-face {
+  font-family: "Cosmo";
+  font-style: normal;
+  font-weight: 400;
+  src: url("~/public/Cosmo-Regular.otf") format("opentype");
+}
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -16,15 +21,9 @@
   }
 }
 
-@font-face {
-  font-family: "Cosmo-Regular";
-  font-style: normal;
-  font-weight: 400;
-  src: url("/public/Cosmo-Regular.otf") format("otf");
-}
+
 
 body {
-  fontfamily: "Cosmo-Regular";
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -32,6 +31,10 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+.cosmo {
+  font-family: "Cosmo";
 }
 
 @layer utilities {

@@ -5,6 +5,7 @@ module nfts::chat {
     use sui::transfer;
     use sui::tx_context::{Self, TxContext};
     use std::vector::length;
+    use sui::clock::{Self, Clock};
 
     /// Max text length.
     const MAX_TEXT_LENGTH: u64 = 512;
@@ -64,13 +65,14 @@ module nfts::chat {
         ref_id: Option<address>,
         metadata: vector<u8>,
         chat_room: address,
+        clock: &Clock,
         ctx: &mut TxContext,
     ) {
         assert!(length(&text) <= MAX_TEXT_LENGTH, ETextOverflow);
         let chat = Chat {
             sender: ctx.get_caller(),
             text: text,
-            timestamp: ctx.get_block_timestamp(),
+            timestamp: clock::timestamp_ms(clock),
             ref_id,
             metadata,
         };
@@ -86,9 +88,10 @@ module nfts::chat {
         text: vector<u8>,
         metadata: vector<u8>,
         chat_room: address,
+        clock: &Clock,
         ctx: &mut TxContext,
     ) {
-        post_internal(text, option::none(), metadata, chat_room, ctx);
+        post_internal(text, option::none(), metadata, chat_room, clock, ctx);
     }
 
     public entry fun post_with_ref(
@@ -96,8 +99,9 @@ module nfts::chat {
         text: vector<u8>,
         ref_identifier: address,
         metadata: vector<u8>,
+        clock: &Clock,
         ctx: &mut TxContext,
     ) {
-        post_internal(text, some(ref_identifier), metadata, chat_room, ctx);
+        post_internal(text, some(ref_identifier), metadata, chat_room, clock, ctx);
     }
 }

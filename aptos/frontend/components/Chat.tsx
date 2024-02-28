@@ -75,7 +75,7 @@ export default function Chat() {
                 {history.map((message, index) => (
 
                     <div key={index} className={message.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
-                        <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(account?.address as string) + ": "}{hex2a(message.text.slice(2))}</p>
+                        <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(message.sender as string) + ": "}{hex2a(message.text.slice(2))}</p>
 
                         <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
                     </div>

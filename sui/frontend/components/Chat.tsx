@@ -59,6 +59,7 @@ export default function Chat() {
 
   const postMessage = () => {
     if (data?.data) {
+      /*
       const messageData = await getMessages();
       if (messageData && messageData.messages.length > 1) {
         const byteArray: Uint8Array = new Uint8Array(messageData.messages[1].fields.text);
@@ -66,7 +67,7 @@ export default function Chat() {
         console.log(text);
       }
 
-      /* const message_count = getMessages(data.data)?.message_count;
+     const message_count = getMessages(data.data)?.message_count;
       console.log(message_count);
 
       const messages = getMessages(data.data)?.messages;

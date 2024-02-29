@@ -22,9 +22,6 @@ interface Message {
   }
 }
 
-// instantiate the client
-
-
 export default function Chat() {
   const client = useSuiClient();
   const chatRoomId = "0xca1bda97e8fb23d7866d11df16f4056eaa7a0bee75f876869bad94b091fb97f2";
@@ -42,27 +39,13 @@ export default function Chat() {
   const [history, setHistory] = useState([] as Message[]);
   const [message, setMessage] = useState("hello");
 
-  function getMessages() {
+  async function getMessages() {
     if (data?.data?.content?.dataType !== "moveObject") {
       return null;
     }
-    // setHistory(data.data.content as unknown as Message[]);
     //@ts-ignore
-    setHistory(data.data.content.fields.messages);
-    //@ts-ignore
-    return data.data.content.fields.messages as Message[];
-
-    /* TODO: Replace with Sui syntax
-
-    const [messages] = await client.useABI(abi).view.get_messages({
-        functionArguments: [abi.address],
-        typeArguments: [],
-    })
-    console.log(messages);
-    console.log(account?.address)
-    await reset();
-    setHistory(messages as Message[]);
-    */
+    setHistory(data.data.content.fields.messages as Message[]);
+    await refetch();
   }
 
   useEffect(() => {
@@ -76,7 +59,7 @@ export default function Chat() {
 
   const postMessage = () => {
     if (data?.data) {
-      const messageData = getMessages();
+      const messageData = await getMessages();
       if (messageData && messageData.messages.length > 1) {
         const byteArray: Uint8Array = new Uint8Array(messageData.messages[1].fields.text);
         const text = new TextDecoder().decode(byteArray);

@@ -3,12 +3,13 @@ import React from "react";
 import "@mysten/dapp-kit/dist/index.css";
 import Image from "next/image";
 import Chat from "../components/Chat";
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
+import { ConnectButton } from "@mysten/dapp-kit";
 //import { SuiKit } from '@scallop-io/sui-kit';
 import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { getFullnodeUrl } from '@mysten/sui.js/client';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const chatRoomId="0xca1bda97e8fb23d7866d11df16f4056eaa7a0bee75f876869bad94b091fb97f2";
 
 export default function Home() {
 
@@ -16,6 +17,7 @@ export default function Home() {
 const { networkConfig } = createNetworkConfig({
 	localnet: { url: getFullnodeUrl('localnet') },
 	mainnet: { url: getFullnodeUrl('mainnet') },
+  m2: {url: 'https://sui.devnet.m2.movementlabs.xyz'}
 });
 
 const queryClient = new QueryClient();
@@ -24,7 +26,7 @@ const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="localnet">
+      <SuiClientProvider networks={networkConfig} defaultNetwork="m2">
         <WalletProvider>
           <main className="flex min-h-screen flex-col items-center justify-between p-24">
           
@@ -53,7 +55,7 @@ const queryClient = new QueryClient();
                 </div>
               </div>
 
-            <Chat />
+            <Chat id={chatRoomId}/>
 
             <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-yellow-400 before:dark:opacity-10 after:dark:from-yellow-700 after:dark:via-[#ead622] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
 

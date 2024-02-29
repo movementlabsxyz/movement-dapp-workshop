@@ -1,10 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSubmitTransaction } from "@thalalabs/surf/hooks";
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
+import {
+    useCurrentAccount,
+    useSignAndExecuteTransactionBlock,
+    useSuiClient,
+    useSuiClientQuery,
+  } from "@mysten/dapp-kit";
 import { NextResponse } from "next/server";
 import { hex2a, formatDate, formatAddress } from "@/util/functions";
 import { SuiObjectData } from "@mysten/sui.js/client";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
 
 interface Message {
     sender: string;
@@ -18,9 +24,19 @@ interface Message {
 
 
 const chatRoomId = "";
-export default function Chat() {
-
+export default function Chat({ id }: { id: string }) {
+    const client = useSuiClient();
+    const CHAT_PACKAGE_ID = "0xb38572bc4467dc0e7eed592e0b74e83b1db554eefbf9126e064f74dbb50fef59";
     const currentAccount = useCurrentAccount();
+    const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
+    const { data, isPending, error, refetch } = useSuiClientQuery("getObject", {
+        id,
+        options: {
+          showContent: true,
+          showOwner: true,
+        },
+      });
+
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("hello");
 
@@ -64,20 +80,14 @@ export default function Chat() {
 
     
 
-    const executeMoveCall = (method: "increment" | "reset") => {
+    const postMessage = () => {
         const txb = new TransactionBlock();
     
-        if (method === "reset") {
+        
             txb.moveCall({
                 arguments: [txb.object(id), txb.pure.u64(0)],
-                target: `${counterPackageId}::counter::set_value`,
-            });
-        }   else {
-            txb.moveCall({
-                arguments: [txb.object(id)],
-                target: `${counterPackageId}::counter::increment`,
-          });
-        }
+                target: `${CHAT_PACKAGE_ID}::chat::post`,
+            }); 
     
         signAndExecute(
           {
@@ -107,8 +117,8 @@ export default function Chat() {
             <div className="">
                 {history.map((message, index) => (
 
-                    <div key={index} className={message.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
-                        <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == account?.address ? "You: " : formatAddress(message.sender as string) + ": "}{hex2a(message.text.slice(2))}</p>
+                    <div key={index} className={message.sender == currentAccount?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
+                        <p className={message.sender == currentAccount?.address ? "text-stone-400" : ""}>{message.sender == currentAccount?.address ? "You: " : formatAddress(message.sender as string) + ": "}{hex2a(message.text.slice(2))}</p>
 
                         <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
                     </div>

@@ -9,7 +9,6 @@ import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/
 import { getFullnodeUrl } from '@mysten/sui.js/client';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const chatRoomId="0xca1bda97e8fb23d7866d11df16f4056eaa7a0bee75f876869bad94b091fb97f2";
 
 export default function Home() {
 
@@ -21,8 +20,6 @@ const { networkConfig } = createNetworkConfig({
 });
 
 const queryClient = new QueryClient();
-
-//const suiKit = new SuiKit
 
   return (
     <QueryClientProvider client={queryClient}>

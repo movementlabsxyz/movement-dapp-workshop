@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSubmitTransaction } from "@thalalabs/surf/hooks";
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
+import { useCurrentAccount } from "@mysten/dapp-kit";
 import { NextResponse } from "next/server";
 import { hex2a, formatDate, formatAddress } from "@/util/functions";
 import { SuiObjectData } from "@mysten/sui.js/client";
@@ -20,7 +20,7 @@ interface Message {
 const chatRoomId = "";
 export default function Chat() {
 
-    const currentAccount = useCurrentAccount();
+    const account = useCurrentAccount();
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("hello");
 
@@ -60,7 +60,7 @@ export default function Chat() {
         const intervalId = setInterval(getMessages, 5000); 
 
         return () => clearInterval(intervalId);
-    }, [currentAccount?.address, submitResult, submitError, submitIsLoading])
+    }, [account?.address, submitResult, submitError, submitIsLoading])
 
     
 

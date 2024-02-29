@@ -1,1 +1,0 @@
-export { MultiSigClient } from './client';

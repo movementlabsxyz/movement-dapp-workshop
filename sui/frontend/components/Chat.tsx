@@ -1,11 +1,11 @@
+/* 
 "use client";
 import { useEffect, useState } from "react";
-import { createSurfClient, createEntryPayload } from "@thalalabs/surf";
-import { Aptos, AptosConfig, Network } from '@aptos-labs/ts-sdk';
 import { useSubmitTransaction } from "@thalalabs/surf/hooks";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+
 import { NextResponse } from "next/server";
 import { hex2a, formatDate, formatAddress } from "@/util/functions";
+import { SuiObjectData } from "@mysten/sui.js/client";
 
 interface Message {
     sender: string;
@@ -16,13 +16,12 @@ interface Message {
 }
 
 // instantiate the client
-const client = createSurfClient(new Aptos(new AptosConfig({ fullnode: "https://aptos.devnet.m1.movementlabs.xyz" })));
+
 
 const chatRoomId = "";
 export default function Chat() {
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("hello");
-    const { account } = useWallet();
 
     const {
         isIdle,
@@ -33,8 +32,16 @@ export default function Chat() {
         data: submitResult,
     } = useSubmitTransaction();
 
+    function getCounterFields(data: SuiObjectData) {
+        if (data.content?.dataType !== "moveObject") {
+          return null;
+        }
+      
+        return data.content.fields as { value: number; owner: string };
+      }
+
     const getMessages = async () => {
-        /* TODO: Replace with Sui syntax
+        TODO: Replace with Sui syntax
 
         const [messages] = await client.useABI(abi).view.get_messages({
             functionArguments: [abi.address],
@@ -44,7 +51,7 @@ export default function Chat() {
         console.log(account?.address)
         await reset();
         setHistory(messages as Message[]);
-        */
+        
     }
 
     useEffect(() => {
@@ -54,21 +61,40 @@ export default function Chat() {
         return () => clearInterval(intervalId);
     }, [account?.address, submitResult, submitError, submitIsLoading])
 
+    
 
-    const postMessage = async () => {
-        try {
-            const payload = createEntryPayload(abi, {
-                function: 'post',
-                typeArguments: [],
-                functionArguments: [message, [], abi.address],
-
+    const executeMoveCall = (method: "increment" | "reset") => {
+        const txb = new TransactionBlock();
+    
+        if (method === "reset") {
+            txb.moveCall({
+                arguments: [txb.object(id), txb.pure.u64(0)],
+                target: `${counterPackageId}::counter::set_value`,
             });
-            const tx = await submitTransaction(payload);
-            return NextResponse.json({ tx });
-        } catch (e) {
-            console.error('error', e);
+        }   else {
+            txb.moveCall({
+                arguments: [txb.object(id)],
+                target: `${counterPackageId}::counter::increment`,
+          });
         }
-    };
+    
+        signAndExecute(
+          {
+            transactionBlock: txb,
+            options: {
+              showEffects: true,
+              showObjectChanges: true,
+            },
+          },
+          {
+            onSuccess: (tx) => {
+              client.waitForTransactionBlock({ digest: tx.digest }).then(() => {
+                refetch();
+              });
+            },
+          },
+        );
+      };
 
     const updateMessage = (e: any) => {
         setMessage(e.target.value);
@@ -95,4 +121,4 @@ export default function Chat() {
             <button className="bg-black border-gray-300 rounded-lg border-[1px] text-white" onClick={postMessage}>Send</button>
         </div>
     )
-}
+}*/

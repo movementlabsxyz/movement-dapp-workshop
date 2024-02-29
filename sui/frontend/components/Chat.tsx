@@ -11,8 +11,10 @@ import { NextResponse } from "next/server";
 import { hex2a, formatDate, formatAddress } from "@/util/functions";
 import { SuiObjectData } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { stringify } from "postcss";
 
 interface Message {
+    fields: any;
     sender: string;
     text: string,
     timestamp: number;
@@ -49,12 +51,11 @@ export default function Chat({ id }: { id: string }) {
         data: submitResult,
     } = useSubmitTransaction();
 
-    const getMessages = async (data: SuiObjectData) => {
+    function getMessages(data: SuiObjectData) {
         if (data?.content?.dataType !== "moveObject") {
             return null;
           }
-          console.log(data.content.fields);
-          return data.content.fields as { messages: string; number: string };
+          return data.content.fields as unknown as { message_count: number; messages:  Message[] };
         
         /* TODO: Replace with Sui syntax
 
@@ -82,8 +83,20 @@ export default function Chat({ id }: { id: string }) {
 
     const postMessage = () => {
         if (data?.data) {
-            getMessages(data.data);
+            const messageData = getMessages(data.data);
+            if (messageData && messageData.messages.length > 1) {
+                const byteArray: Uint8Array = new Uint8Array(messageData.messages[1].fields.text);
+                const text = new TextDecoder().decode(byteArray);
+                console.log(text); 
+            }
+
+            /* const message_count = getMessages(data.data)?.message_count;
+            console.log(message_count);
+
+            const messages = getMessages(data.data)?.messages;
+            if (messages) console.log(messages[1]); */
         }
+
         const txb = new TransactionBlock();
     
         

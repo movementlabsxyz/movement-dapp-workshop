@@ -47,7 +47,9 @@ export default function Chat() {
       return null;
     }
     // setHistory(data.data.content as unknown as Message[]);
+    //@ts-ignore
     setHistory(data.data.content.fields.messages);
+    //@ts-ignore
     return data.data.content.fields.messages as Message[];
 
     /* TODO: Replace with Sui syntax

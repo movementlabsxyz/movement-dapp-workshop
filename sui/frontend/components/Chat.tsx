@@ -1,8 +1,7 @@
-/* 
 "use client";
 import { useEffect, useState } from "react";
 import { useSubmitTransaction } from "@thalalabs/surf/hooks";
-
+import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { NextResponse } from "next/server";
 import { hex2a, formatDate, formatAddress } from "@/util/functions";
 import { SuiObjectData } from "@mysten/sui.js/client";
@@ -20,6 +19,8 @@ interface Message {
 
 const chatRoomId = "";
 export default function Chat() {
+
+    const currentAccount = useCurrentAccount();
     const [history, setHistory] = useState([] as Message[]);
     const [message, setMessage] = useState("hello");
 
@@ -41,7 +42,7 @@ export default function Chat() {
       }
 
     const getMessages = async () => {
-        TODO: Replace with Sui syntax
+        /* TODO: Replace with Sui syntax
 
         const [messages] = await client.useABI(abi).view.get_messages({
             functionArguments: [abi.address],
@@ -51,7 +52,7 @@ export default function Chat() {
         console.log(account?.address)
         await reset();
         setHistory(messages as Message[]);
-        
+        */
     }
 
     useEffect(() => {
@@ -59,7 +60,7 @@ export default function Chat() {
         const intervalId = setInterval(getMessages, 5000); 
 
         return () => clearInterval(intervalId);
-    }, [account?.address, submitResult, submitError, submitIsLoading])
+    }, [currentAccount?.address, submitResult, submitError, submitIsLoading])
 
     
 
@@ -121,4 +122,4 @@ export default function Chat() {
             <button className="bg-black border-gray-300 rounded-lg border-[1px] text-white" onClick={postMessage}>Send</button>
         </div>
     )
-}*/
+}

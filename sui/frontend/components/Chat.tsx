@@ -15,7 +15,7 @@ import { stringify } from "postcss";
 interface Message {
   fields: {
     sender: string;
-    text: string,
+    text: number[];
     timestamp: number;
     ref_id: string;
     metadata: string;

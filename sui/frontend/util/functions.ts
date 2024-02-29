@@ -10,7 +10,6 @@ export function hex2a(hexx: string) {
 }
 
 export function dec2a(decimals: number[]) {
-
     var str = '';
     for (var i = 0; i < decimals.length; i++)
         str += String.fromCharCode(decimals[i]);

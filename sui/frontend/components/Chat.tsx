@@ -49,15 +49,13 @@ export default function Chat({ id }: { id: string }) {
         data: submitResult,
     } = useSubmitTransaction();
 
-    function getCounterFields(data: SuiObjectData) {
-        if (data.content?.dataType !== "moveObject") {
-          return null;
-        }
-      
-        return data.content.fields as { value: number; owner: string };
-      }
-
-    const getMessages = async () => {
+    const getMessages = async (data: SuiObjectData) => {
+        if (data?.content?.dataType !== "moveObject") {
+            return null;
+          }
+          console.log(data.content.fields);
+          return data.content.fields as { messages: string; number: string };
+        
         /* TODO: Replace with Sui syntax
 
         const [messages] = await client.useABI(abi).view.get_messages({
@@ -72,7 +70,9 @@ export default function Chat({ id }: { id: string }) {
     }
 
     useEffect(() => {
-        getMessages();
+        if (data?.data) {
+            getMessages(data.data);
+        }
         const intervalId = setInterval(getMessages, 5000); 
 
         return () => clearInterval(intervalId);
@@ -81,6 +81,9 @@ export default function Chat({ id }: { id: string }) {
     
 
     const postMessage = () => {
+        if (data?.data) {
+            getMessages(data.data);
+        }
         const txb = new TransactionBlock();
     
         

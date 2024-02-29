@@ -7,7 +7,7 @@ import {
   useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import { NextResponse } from "next/server";
-import { hex2a, formatDate, formatAddress } from "@/util/functions";
+import { dec2a, formatDate, formatAddress } from "@/util/functions";
 import { SuiObjectData } from "@mysten/sui.js/client";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { stringify } from "postcss";
@@ -110,7 +110,7 @@ export default function Chat() {
         {history.map((message, index) => (
 
           <div key={index} className={message.fields.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
-            <p className={message.fields.sender == account?.address ? "text-stone-400" : ""}>{message.fields.sender == account?.address ? "You: " : formatAddress(message.fields.sender as string) + ": "}{hex2a(message.fields.text.slice(2))}</p>
+            <p className={message.fields.sender == account?.address ? "text-stone-400" : ""}>{message.fields.sender == account?.address ? "You: " : formatAddress(message.fields.sender as string) + ": "}{dec2a(message.fields.text)}</p>
 
             <p className="text-xs">{formatDate(new Date(message.fields.timestamp * 1000))}</p>
           </div>

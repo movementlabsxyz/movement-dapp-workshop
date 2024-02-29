@@ -1,9 +1,19 @@
 
 export function hex2a(hexx: string) {
+    console.log(hexx)
     var hex = hexx.toString();//force conversion
     var str = '';
     for (var i = 0; i < hex.length; i += 2)
         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    console.log(str);
+    return str;
+}
+
+export function dec2a(decimals: number[]) {
+
+    var str = '';
+    for (var i = 0; i < decimals.length; i++)
+        str += String.fromCharCode(decimals[i]);
     return str;
 }
 

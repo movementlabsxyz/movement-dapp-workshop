@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSubmitTransaction } from "@thalalabs/surf/hooks";
 import {
   useCurrentAccount,
   useSignAndExecuteTransactionBlock,
@@ -14,12 +13,13 @@ import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { stringify } from "postcss";
 
 interface Message {
-  fields: any;
-  sender: string;
-  text: string,
-  timestamp: number;
-  ref_id: string;
-  metadata: string;
+  fields: {
+    sender: string;
+    text: string,
+    timestamp: number;
+    ref_id: string;
+    metadata: string;
+  }
 }
 
 // instantiate the client
@@ -42,20 +42,13 @@ export default function Chat() {
   const [history, setHistory] = useState([] as Message[]);
   const [message, setMessage] = useState("hello");
 
-  const {
-    isIdle,
-    reset,
-    isLoading: submitIsLoading,
-    error: submitError,
-    submitTransaction,
-    data: submitResult,
-  } = useSubmitTransaction();
-
   function getMessages() {
     if (data?.data?.content?.dataType !== "moveObject") {
       return null;
     }
-    return data.data.content.fields as unknown as { message_count: number; messages: Message[] };
+    // setHistory(data.data.content as unknown as Message[]);
+    setHistory(data.data.content.fields.messages);
+    return data.data.content.fields.messages as Message[];
 
     /* TODO: Replace with Sui syntax
 
@@ -77,7 +70,7 @@ export default function Chat() {
     const intervalId = setInterval(getMessages, 5000);
 
     return () => clearInterval(intervalId);
-  }, [account?.address, submitResult, submitError, submitIsLoading])
+  }, [account?.address, data, isPending, error])
 
   const postMessage = () => {
     if (data?.data) {
@@ -130,10 +123,10 @@ export default function Chat() {
       <div className="">
         {history.map((message, index) => (
 
-          <div key={index} className={message.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
-            <p className={message.sender == account?.address ? "text-stone-400" : ""}>{message.sender == currentAccount?.address ? "You: " : formatAddress(message.sender as string) + ": "}{hex2a(message.text.slice(2))}</p>
+          <div key={index} className={message.fields.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>
+            <p className={message.fields.sender == account?.address ? "text-stone-400" : ""}>{message.fields.sender == account?.address ? "You: " : formatAddress(message.fields.sender as string) + ": "}{hex2a(message.fields.text.slice(2))}</p>
 
-            <p className="text-xs">{formatDate(new Date(message.timestamp * 1000))}</p>
+            <p className="text-xs">{formatDate(new Date(message.fields.timestamp * 1000))}</p>
           </div>
         ))}
       </div>

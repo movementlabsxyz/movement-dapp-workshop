@@ -58,26 +58,11 @@ export default function Chat() {
   }, [account?.address, data, isPending, error])
 
   const postMessage = () => {
-    if (data?.data) {
-      /*
-      const messageData = await getMessages();
-      if (messageData && messageData.messages.length > 1) {
-        const byteArray: Uint8Array = new Uint8Array(messageData.messages[1].fields.text);
-        const text = new TextDecoder().decode(byteArray);
-        console.log(text);
-      }
-
-     const message_count = getMessages(data.data)?.message_count;
-      console.log(message_count);
-
-      const messages = getMessages(data.data)?.messages;
-      if (messages) console.log(messages[1]); */
-    }
 
     const txb = new TransactionBlock();
 
     txb.moveCall({
-      arguments: [txb.pure(message), txb.pure("gm1"), txb.object(chatRoomId), txb.pure("0x6")],
+      arguments: [txb.pure(message), txb.pure(""), txb.object(chatRoomId), txb.pure("0x6")],
       target: `${CHAT_PACKAGE_ID}::chat::post`,
     });
 

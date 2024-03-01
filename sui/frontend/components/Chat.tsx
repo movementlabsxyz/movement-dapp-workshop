@@ -77,7 +77,7 @@ export default function Chat() {
     const txb = new TransactionBlock();
 
     txb.moveCall({
-      arguments: [txb.object(chatRoomId), txb.pure.u64(0)],
+      arguments: [txb.pure(message), txb.pure("gm1"), txb.object(chatRoomId), txb.pure("0x6")],
       target: `${CHAT_PACKAGE_ID}::chat::post`,
     });
 
@@ -95,6 +95,9 @@ export default function Chat() {
             refetch();
           });
         },
+        onError: (error) => {
+          console.log(error);
+        }
       },
     );
   };

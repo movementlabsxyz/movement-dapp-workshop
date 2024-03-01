@@ -2,6 +2,9 @@
 
 This repository contains two iterations of a simple dApp that allows users to post messages to a chat room. The chat room can be accessed by anyone and anyone can create their own chat room. The dApp is built using the Aptos Move language and Sui Move language.
 
+Aptos: `https://main.d2761w90g9sxb3.amplifyapp.com/`
+Sui: `https://main.d2qxq8n60k8d0a.amplifyapp.com/`
+
 ## Requirements
 
 Movement CLI

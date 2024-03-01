@@ -54,8 +54,8 @@ module chat::chat {
         transfer::public_transfer(room, tx_context::sender(ctx));
     }
     
-    public fun get_messages(room: &ChatRoom) : vector<Message> {
-        room.messages
+    public fun get_messages(room: &ChatRoom) : &vector<Message> {
+        &room.messages
     }
 
     #[allow(lint(self_transfer))]

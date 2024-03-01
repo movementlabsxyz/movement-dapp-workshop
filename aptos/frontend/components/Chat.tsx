@@ -40,8 +40,11 @@ export default function Chat() {
         })
         console.log(messages);
         console.log(account?.address)
-        await reset();
         setHistory(messages as Message[]);
+        await reset();
+        const container = document.getElementById("scrollableContainer");
+        //@ts-ignore
+        container.scrollTop = container.scrollHeight;
     }
 
     useEffect(() => {
@@ -74,7 +77,8 @@ export default function Chat() {
     return (
         <div className="grid grid-flow-col-1 group rounded-lg border border-transparent px-5 py-4 transition-colors border-gray-300 dark:border-neutral-700 dark:bg-neutral-800/30">
             <h1 className="text-lg">History</h1>
-            <div className="overflow-y-scroll h-72">
+            <div id="scrollableContainer" className="overflow-y-scroll h-72">
+
 
                 {history.map((message, index) => (
 

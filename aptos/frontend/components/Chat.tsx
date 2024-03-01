@@ -46,7 +46,7 @@ export default function Chat() {
 
     useEffect(() => {
         getMessages();
-        const intervalId = setInterval(getMessages, 5000); 
+        const intervalId = setInterval(getMessages, 5000);
 
         return () => clearInterval(intervalId);
     }, [account?.address, submitResult, submitError, submitIsLoading])
@@ -74,7 +74,8 @@ export default function Chat() {
     return (
         <div className="grid grid-flow-col-1 group rounded-lg border border-transparent px-5 py-4 transition-colors border-gray-300 dark:border-neutral-700 dark:bg-neutral-800/30">
             <h1 className="text-lg">History</h1>
-            <div className="">
+            <div className="overflow-y-scroll h-72">
+
                 {history.map((message, index) => (
 
                     <div key={index} className={message.sender == account?.address ? "text-right border-b-[1px] border-stone-700 p-2" : "border-b-[1px] border-stone-700 p-2"}>

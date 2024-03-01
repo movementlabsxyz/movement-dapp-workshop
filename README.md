@@ -80,7 +80,7 @@ movement sui client switch movement
 Then you can publish the module:
 
 ```bash
-movement sui move publish --gas-budget 5000000 --skip-dependency-verification
+movement sui client publish --gas-budget 5000000 --skip-dependency-verification
 ```
 
 Look at the transaction data output. Under "Transaction Effects" you'll see Created Objects:

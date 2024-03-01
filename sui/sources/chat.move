@@ -53,13 +53,10 @@ module chat::chat {
         };
         transfer::public_transfer(room, tx_context::sender(ctx));
     }
-
-    /* 
-    #[view]
-    public fun get_messages(addr: address) : vector<Message> acquires ChatRoom {
-        let room = borrow_global<ChatRoom>(addr);
+    
+    public fun get_messages(room: &ChatRoom) : vector<Message> {
         room.messages
-    } */
+    }
 
     #[allow(lint(self_transfer))]
     /// Mint (post) a Chat object.

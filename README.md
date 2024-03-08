@@ -17,7 +17,7 @@ clone this repository
 
 ## Aptos Iteration
 
-The first iteration of the dApp is built using the Aptos Move language. The dApp is located in the `aptos` directory. Once inside the repository, navigate to the `aptos` directory and run the following command to deploy the dApp to the Move VM.
+The first iteration of the dApp is built using the Aptos Move language. The dApp is located in the `aptos` directory. Once inside the repository, navigate to the `aptos` directory and run the following commands to deploy the dApp to the Move VM.
 
 ```bash
 cd aptos

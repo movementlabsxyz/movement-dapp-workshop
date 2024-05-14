@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-chat_addr = "_"
+chat_addr = "8c9e3104a866a70ebee3d3aab02ff66d5d7a70993f0f04899f5424d47bf1d10a"
 
 [dev-addresses]
 

@@ -38,6 +38,11 @@ module chat_addr::Chat {
         move_to<ChatRoom>(account, room);
     }
 
+    #[view]
+    public fun signature() : address {
+        @<address>
+    }
+
     /// Create a new chat room.
     public entry fun create_chat_room(account: &signer) {
         let addr = signer::address_of(account);

@@ -30,11 +30,21 @@ Aptos language requires you to initialize the Move environment:
 ```bash
 movement aptos move init
 ```
+or if using Aptos CLI:
+
+```bash
+aptos move init
+```
 
 Then you can publish the module:
 
 ```bash
 movement aptos move publish --named-addresses chat_addr=default
+```
+
+or
+```bash
+aptos move publish --named-addresses chat_addr=default
 ```
 
 ### Test Front End
@@ -74,16 +84,34 @@ Sui language requires you to add configure your environment for Movement:
 movement sui client new-env --alias movement --rpc https://sui.devnet.m2.movementlabs.xyz
 ```
 
+or if using Sui CLI:
+
+```bash
+sui client new-env --alias movement --rpc https://sui.devnet.m2.movementlabs.xyz
+```
+
 Then switch to `movement`:
 
 ```bash
 movement sui client switch movement
 ```
 
+or
+
+```bash
+sui client switch movement
+```
+
 Then you can publish the module:
 
 ```bash
 movement sui client publish --gas-budget 5000000 --skip-dependency-verification
+```
+
+or
+
+```bash
+sui client publish --gas-budget 5000000 --skip-dependency-verification
 ```
 
 Look at the transaction data output. Under "Transaction Effects" you'll see Created Objects:
